@@ -1,0 +1,12 @@
+# Ignore datasets
+data/*
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore Jupyter Notebooks
+*.ipynb
+
+# Ignore any .ipynb_checkpoints directories
+.ipynb_checkpoints/
