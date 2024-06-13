@@ -1,7 +1,7 @@
 # TrajGPT: Controlled Synthetic Trajectory Generation Using a Multitask Transformer-Based Spatiotemporal Model
 (We will update this README with details of TrajGPT once the paper is publicly available.)
 
-# Requirements
+## Requirements
 Recommended setup: GPU with more than 4GB VRAM and CUDA version 12.3.
 
 ## Installation
