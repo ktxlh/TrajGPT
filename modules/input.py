@@ -11,11 +11,9 @@ class SourceInput(nn.Module):
         """
         Args:
             n_regions (int): The number of tokens in the vocabulary.
-            sequence_length (int): The original maximum sequence length.
             d_embed (int): The dimension of the embeddings.
             lambda_min (float): The minimum scale for space2vec
             lambda_max (float): The maximum scale for space2vec
-            pad_value (int): The padding value for the embeddings.
         """
         super().__init__()
         self.space2vec = Space2Vec(d_embed, lambda_min, lambda_max)

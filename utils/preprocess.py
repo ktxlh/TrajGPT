@@ -106,8 +106,6 @@ def process_time_inplace(df):
     # First row of each user does not have travel time
     df.loc[df.groupby('user_id').nth(0).index, 'travel_time'] = 0
 
-    df['travel_time'] = np.log(df['travel_time'].values + 1e-2)
-
     # Clip duration outliers
     max_duration = df['duration'].quantile(0.99)
     df.loc[df['duration'] > max_duration, 'duration'] = max_duration
@@ -119,16 +117,16 @@ def process_time_inplace(df):
     return max_duration, max_travel_time
 
 
-def split_indices_for_next_prediction(df, sequence_length):
+def split_indices_for_next_prediction(df):
     # Identify instances for next visit prediction
     groupby_user = df.groupby('user_id')
 
     # Find the first index of each instance
     # 1. First instance of each user
     user_first_indices = groupby_user.nth(0).index
-    # 2. Instance with at least sequence_length visits
+    # 2. Instance with at least RAW_SEQ_LEN visits
     max_num_visits_per_user = groupby_user.size().max()
-    long_enough_indices = groupby_user.nth(list(range(-max_num_visits_per_user, -sequence_length))).index
+    long_enough_indices = groupby_user.nth(list(range(-max_num_visits_per_user, -RAW_SEQ_LEN[NEXT_PREDICTION]))).index
     # 3. Combine the two
     first_indices = user_first_indices.union(long_enough_indices)
 
@@ -138,7 +136,7 @@ def split_indices_for_next_prediction(df, sequence_length):
     # 2. Match it with first_indices
     user_last_indices = df.loc[first_indices]['user_id'].apply(lambda user_id: each_user_last_index.loc[user_id]).values
     # 3. Last index of each rolling window
-    rolling_window_last_indices = (first_indices + sequence_length - 1).values
+    rolling_window_last_indices = (first_indices + RAW_SEQ_LEN[NEXT_PREDICTION] - 1).values
     last_indices = np.minimum(rolling_window_last_indices, user_last_indices)
 
     # Sort instances by arrival_time
@@ -187,7 +185,7 @@ def split_index_df_for_infilling(index_df, train_ratio=0.8, val_ratio=0.1, test_
     return train_indices, val_indices, test_indices
 
 
-def split_indices_for_infilling(df, sequence_length):
+def split_indices_for_infilling(df):
     results = []
     
     # Group the DataFrame by 'user_id'
@@ -198,9 +196,9 @@ def split_indices_for_infilling(df, sequence_length):
         # Get the indices of the current group
         indices = group.index
         
-        # Split the indices into chunks of sequence_length
-        for start in range(0, len(indices), sequence_length):
-            end = start + sequence_length
+        # Split the indices into chunks of RAW_SEQ_LEN
+        for start in range(0, len(indices), RAW_SEQ_LEN[INFILLING]):
+            end = start + RAW_SEQ_LEN[INFILLING]
             if end <= len(indices):
                 first_index = indices[start]
                 last_index = indices[end - 1]
@@ -212,24 +210,25 @@ def split_indices_for_infilling(df, sequence_length):
     return split_index_df_for_infilling(index_df)
 
 
-def load_geolife_dataset(task, sequence_length=128):
+def load_geolife_dataset(task):
     df = load_geolife_visit_df()
     process_space_inplace(df)
     max_duration, max_travel_time = process_time_inplace(df)
 
     if task == NEXT_PREDICTION:
-        train_indices, val_indices, test_indices = split_indices_for_next_prediction(df, sequence_length)
+        train_indices, val_indices, test_indices = split_indices_for_next_prediction(df)
     elif task == INFILLING:
-        train_indices, val_indices, test_indices = split_indices_for_infilling(df, sequence_length)
+        # train_indices, val_indices, test_indices = split_indices_for_infilling(df)
+        train_indices, val_indices, test_indices = split_indices_for_next_prediction(df)
     else:
         raise NotImplementedError
 
     # Keep only necessary fields
     df = df[FIELDS]
 
-    train_data = TrajGPTDataset(df, train_indices, sequence_length)
-    val_data = TrajGPTDataset(df, val_indices, sequence_length)
-    test_data = TrajGPTDataset(df, test_indices, sequence_length)
+    train_data = TrajGPTDataset(df, train_indices, task)
+    val_data = TrajGPTDataset(df, val_indices, task)
+    test_data = TrajGPTDataset(df, test_indices, task)
 
     # Number of regions
     num_regions = df['region_id'].nunique()

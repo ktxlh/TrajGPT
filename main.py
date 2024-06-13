@@ -3,6 +3,7 @@ import pandas as pd
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from tqdm import trange
+import matplotlib.pyplot as plt
 
 from modules.model import TrajGPT
 from utils.constants import *
@@ -10,7 +11,7 @@ from utils.metrics import *
 from utils.preprocess import *
 
 
-def train(model, optimizer, train_loader, task, device, num_regions):
+def train():
     """
     Trains the model using the provided optimizer and training data.
 
@@ -42,16 +43,12 @@ def train(model, optimizer, train_loader, task, device, num_regions):
     return np.mean(losses)
 
 
-def evaluate(model, loader, task, device, num_regions, loss_prefix):
+def evaluate(loader, loss_prefix):
     """
     Evaluate the model on the given data loader.
 
     Args:
-        model (torch.nn.Module): The model to evaluate.
         loader (torch.utils.data.DataLoader): The data loader containing the evaluation data.
-        task (str): The task being performed.
-        device (torch.device): The device to use for evaluation.
-        num_regions (int): The number of regions.
         loss_prefix (str): The prefix to use for the loss key in the results dictionary.
 
     Returns:
@@ -95,8 +92,12 @@ if __name__ == "__main__":
     best_epoch, best_score, best_state_dict = -1, float("inf"), None
     train_loss, val_score = [], []
     for epoch in trange(num_epochs):
-        train_loss.append(train(model, optimizer, train_loader, task, device, num_regions))
-        val_score.append(evaluate(model, val_loader, task, device, num_regions, 'val'))
+        train_loss.append(train())
+        val_score.append(evaluate(val_loader, 'val'))
+
+        plt.plot(train_loss)
+        plt.savefig("train_loss.png")
+        plt.close()
 
         # Save the best model
         if val_score[-1]['val_loss'] < best_score:
@@ -110,7 +111,7 @@ if __name__ == "__main__":
     # Test
     model.load_state_dict(best_state_dict)
     model.to(device)
-    test_score = evaluate(model, test_loader, task, device, num_regions, 'test')
+    test_score = evaluate(test_loader, 'test')
     print(test_score)
 
     # DEBUG
@@ -118,8 +119,4 @@ if __name__ == "__main__":
         if "loss" not in k:
             v *= 100
         print(f"{v:.2f}", end=",")
-    
-    import matplotlib.pyplot as plt
-    plt.plot(train_loss)
-    plt.savefig("train_loss.png")
-    plt.close()
+    print()
