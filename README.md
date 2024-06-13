@@ -48,7 +48,7 @@ python3 main.py
 ```
 
 ## Authors
-This software is produced by [Shang-Ling (Kate) Hsu](ktxlh.github.io), the first author of TrajGPT. The subsequent authors of TrajGPT are: Emmanuel Tung, Dr. John Krumm, Dr. Cyrus Shahabi, and Dr. Khurram Shafique.
+This software is produced by [Shang-Ling (Kate) Hsu](https://ktxlh.github.io/), the first author of TrajGPT. The subsequent authors of TrajGPT are: Emmanuel Tung, Dr. John Krumm, Dr. Cyrus Shahabi, and Dr. Khurram Shafique.
 
 ## Support
 We are committed to open-sourcing this project and ensuring that everyone can reproduce the results presented in our paper. If you have any questions, please feel free to open an issue.
