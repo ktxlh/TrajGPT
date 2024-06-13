@@ -3,19 +3,19 @@ from torch import nn
 
 class GMM(nn.Module):
     """Predict GMM parameters given a representation vector"""
-    def __init__(self, d_model, ncomp):
+    def __init__(self, d_model, num_gaussians):
         super().__init__()
-        self.ncomp = ncomp  # number of components in mixture
+        self.num_gaussians = num_gaussians  # number of components in mixture
         self.d_model = d_model
         self.weight = nn.Sequential(
-            nn.Linear(self.d_model, ncomp),
+            nn.Linear(self.d_model, num_gaussians),
             nn.Softplus(),
         )
         self.loc = nn.Sequential(
-            nn.Linear(self.d_model, ncomp),
+            nn.Linear(self.d_model, num_gaussians),
         )
         self.scale = nn.Sequential(
-            nn.Linear(self.d_model, ncomp),
+            nn.Linear(self.d_model, num_gaussians),
             nn.Softplus(),
         )
 

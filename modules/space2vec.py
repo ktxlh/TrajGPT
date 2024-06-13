@@ -6,15 +6,15 @@ class Space2Vec(nn.Module):
     """
     Vectorized implementation of https://arxiv.org/pdf/2003.00824#page=10.60
     """
-    def __init__(self, d_embed, lambda_min, lambda_max, n_scales=64):
+    def __init__(self, d_embed, lambda_min, lambda_max, num_scales=64):
         super().__init__()
 
         self.lambda_min = lambda_min
         self.lambda_max = lambda_max
         self.g = lambda_max / lambda_min
-        self.S = n_scales
+        self.S = num_scales
 
-        scales = torch.arange(n_scales).reshape(1, n_scales)
+        scales = torch.arange(num_scales).reshape(1, num_scales)
         self.register_buffer('scales', scales, persistent=False)
 
         a1 = torch.tensor([1, 0])
@@ -24,7 +24,7 @@ class Space2Vec(nn.Module):
         self.register_buffer('a', a, persistent=False)
 
         self.location_embedding = nn.Sequential(
-            nn.Linear(n_scales * 6, d_embed),
+            nn.Linear(num_scales * 6, d_embed),
             nn.ReLU(),
         )
 
@@ -36,7 +36,7 @@ class Space2Vec(nn.Module):
         """
         nominator = (x @ self.a.T).unsqueeze(-1)  # (..., 3, 1)
         denominator = self.lambda_min * torch.pow(self.g, self.scales / self.S - 1)
-        fraction = nominator / denominator  # (..., 3, n_scales)
-        fraction = fraction.reshape(*fraction.shape[:-2], -1)  # (..., 3*n_scales)
-        PE_sj = torch.concatenate([torch.cos(fraction), torch.sin(fraction)], axis=-1)  # (..., 6*n_scales)
+        fraction = nominator / denominator  # (..., 3, num_scales)
+        fraction = fraction.reshape(*fraction.shape[:-2], -1)  # (..., 3*num_scales)
+        PE_sj = torch.concatenate([torch.cos(fraction), torch.sin(fraction)], axis=-1)  # (..., 6*num_scales)
         return self.location_embedding(PE_sj)  # (..., d_embed)

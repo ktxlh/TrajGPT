@@ -5,12 +5,12 @@ from torch.nn import (Dropout, LayerNorm, Linear, Module, MultiheadAttention,
 
 class CausalMemoryDecoder(TransformerDecoderLayer):
     """Memory-causal Transformer decoder layer without self-attention"""
-    def __init__(self, d_model: int, n_heads: int, sequence_length: int, 
+    def __init__(self, d_model: int, num_heads: int, sequence_len: int, 
                  d_feedforward: int = 2048, dropout: float = 0.1,
                  layer_norm_eps: float = 1e-5, bias: bool = True) -> None:
         Module.__init__(self)
 
-        self.multihead_attn = MultiheadAttention(d_model, n_heads, dropout=dropout, batch_first=True, bias=bias)
+        self.multihead_attn = MultiheadAttention(d_model, num_heads, dropout=dropout, batch_first=True, bias=bias)
         
         # Implementation of Feedforward model
         self.linear1 = Linear(d_model, d_feedforward, bias=bias)
@@ -24,7 +24,7 @@ class CausalMemoryDecoder(TransformerDecoderLayer):
         
         self.activation = F.relu
 
-        causal_memory_mask = Transformer.generate_square_subsequent_mask(sequence_length)
+        causal_memory_mask = Transformer.generate_square_subsequent_mask(sequence_len)
         self.register_buffer("causal_memory_mask", causal_memory_mask, persistent=False)
 
 

@@ -7,10 +7,10 @@ from utils.constants import N_SPECIAL_TOKENS, PAD
 
 
 class SourceInput(nn.Module):
-    def __init__(self, n_regions, d_embed, lambda_min, lambda_max):
+    def __init__(self, num_regions, d_embed, lambda_min, lambda_max):
         """
         Args:
-            n_regions (int): The number of tokens in the vocabulary.
+            num_regions (int): The number of tokens in the vocabulary.
             d_embed (int): The dimension of the embeddings.
             lambda_min (float): The minimum scale for space2vec
             lambda_max (float): The maximum scale for space2vec
@@ -18,7 +18,7 @@ class SourceInput(nn.Module):
         super().__init__()
         self.space2vec = Space2Vec(d_embed, lambda_min, lambda_max)
         self.time2vec = Time2Vec(d_embed)
-        self.region_embedding = nn.Embedding(N_SPECIAL_TOKENS + n_regions, d_embed, padding_idx=PAD)
+        self.region_embedding = nn.Embedding(N_SPECIAL_TOKENS + num_regions, d_embed, padding_idx=PAD)
 
     def forward(self, region_id, x, y, arrival_time, departure_time):
         """

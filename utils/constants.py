@@ -1,9 +1,6 @@
 # Special tokens
-PAD = 0
-BLANK = 1
-SEP = 2
-ANS = 3
 N_SPECIAL_TOKENS = 4
+PAD, BLANK, SEP, ANS = list(range(N_SPECIAL_TOKENS))
 
 # Tasks
 NEXT_PREDICTION = 0

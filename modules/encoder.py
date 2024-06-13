@@ -6,22 +6,22 @@ from modules.positional_encoding import PositionalEncoding
 
 class CausalEncoder(nn.Module):
     """Causal Transformer Encoder"""
-    def __init__(self, d_model, n_heads, n_layers, sequence_length):
+    def __init__(self, d_model, num_heads, num_layers, sequence_len):
         """
         Args:
             d_embed (int): The dimension of the embeddings.
-            n_heads (int): The number of heads in the multi-head attention mechanism.
-            n_layers (int): The number of layers in the transformer encoder.
-            sequence_length (int): The maximum sequence length.
+            num_heads (int): The number of heads in the multi-head attention mechanism.
+            num_layers (int): The number of layers in the transformer encoder.
+            sequence_len (int): The maximum sequence length.
         """
         super().__init__()
 
         self.transformer_encoder = TransformerEncoder(
-            TransformerEncoderLayer(d_model, n_heads, batch_first=True),
-            n_layers,
+            TransformerEncoderLayer(d_model, num_heads, batch_first=True),
+            num_layers,
         )
         self.pos_encoder = PositionalEncoding(d_model)
-        src_mask = nn.Transformer.generate_square_subsequent_mask(sequence_length)
+        src_mask = nn.Transformer.generate_square_subsequent_mask(sequence_len)
         self.register_buffer('src_mask', src_mask, persistent=False)
 
     def forward(self, src):

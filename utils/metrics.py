@@ -12,7 +12,7 @@ def instantiate_gmm(outputs, mask):
     outputs (dict): values Shape (batch_size, seq_len)
     mask (tensor) shape (batch_size, seq_len) or indices
     """
-    weight, loc, scale = [outputs[k][mask] for k in ['weight', 'loc', 'scale']]  # (num_true_in_mask, ncomp)
+    weight, loc, scale = [outputs[k][mask] for k in ['weight', 'loc', 'scale']]  # (num_true_in_mask, num_gaussians)
     mix = D.Categorical(weight / weight.sum(dim=-1, keepdim=True))
     comp = D.Normal(loc, scale)
     gmm = D.mixture_same_family.MixtureSameFamily(mix, comp)
@@ -24,7 +24,7 @@ def compute_gmm_nll(outputs, labels, loss_mask):
     Compute negative log likelihood of temporal labels given predicted GMM.
 
         Parameters:
-            outputs (dict): {key (str): value (FloatTensor) Shape (batch_size, seq_len, ntoken, ncomp)}
+            outputs (dict): {key (str): value (FloatTensor) Shape (batch_size, seq_len, ntoken, num_gaussians)}
                 where key is one of {"weight", "loc", "scale"}
             labels (FloatTensor):                        Shape (batch_size, seq_len)
             loss_mask (BoolTensor):                      Shape (batch_size, seq_len)
