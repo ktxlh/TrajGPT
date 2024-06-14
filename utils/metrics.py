@@ -98,9 +98,12 @@ def compute_scores(input, output, target, task, max_duration, max_travel_time):
         is_after_sep = compute_after_sep_mask(input['region_id'][:, 1:])
         metric_mask = (is_after_sep & (~is_special))
 
+    # Do not predict actual missing spans between visits
+    is_travel = (target['travel_time'] < MAX_VALID_TRAVEL_TIME)
+
     r_score = count_top_k_correct(output['region_id'][metric_mask], target['region_id'][metric_mask])
     d_score = compute_p_within_t(output['duration'], target['duration'], metric_mask, max_duration)
-    t_score = compute_p_within_t(output['travel_time'], target['travel_time'], metric_mask, max_travel_time)
+    t_score = compute_p_within_t(output['travel_time'], target['travel_time'], metric_mask & is_travel, max_travel_time)
     return {
         'region_id': r_score, 
         'travel_time': t_score,

@@ -16,16 +16,8 @@ def train():
     """
     Trains the model using the provided optimizer and training data.
 
-    Args:
-        model (nn.Module): The model to be trained.
-        optimizer (torch.optim.Optimizer): The optimizer used for training.
-        train_loader (torch.utils.data.DataLoader): The data loader for the training data.
-        task (str): The task being performed.
-        args.device (torch.args.device): The args.device to be used for training.
-        num_regions (int): The number of regions.
-
     Returns:
-        float: The mean loss over all training batches.
+        list: A list of float. Each is the loss of an iteration.
     """
     model.train()
 

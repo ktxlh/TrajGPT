@@ -36,14 +36,10 @@ python3 utils/preprocess.py
 ```
 This step takes around 5 minutes and only needs to be run once.
 
-4. Run `main.py`. It took around 10 minutes on A100, or reaching `patience` after hundreds of epochs.
-Please specify one of `--next_prediction` or `--infilling` as the argument.
+4. Run `main.py`. It took around 45 minutes on NVIDIA A100 GPU, or reaching patience after hundreds of epochs.
+Please specify the task by replacing `$task` with one of `next_prediction` or `infilling`:
 ```bash
-python3 main.py --next_prediction
-```
-or
-```bash
-python3 main.py --infilling
+python3 main.py --task $task
 ```
 
 ## Authors

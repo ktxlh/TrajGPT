@@ -5,10 +5,9 @@ from utils.constants import PAD, RAW_SEQ_LEN
 
 
 class TrajGPTDataset(Dataset):
-    def __init__(self, df, indices, task):
+    def __init__(self, df, indices, ):
         self.df = df
         self.indices = indices.astype(int)
-        self.task = task
 
     def __len__(self):
         return len(self.indices)
@@ -19,7 +18,7 @@ class TrajGPTDataset(Dataset):
         instance = torch.from_numpy(instance).float()
 
         # Pad the sequence to the maximum length
-        if instance.shape[0] < RAW_SEQ_LEN[self.task]:
+        if instance.shape[0] < RAW_SEQ_LEN:
             # Pad left instead of right so the last element is the target
-            instance = pad(instance, (0, 0, RAW_SEQ_LEN[self.task] - instance.shape[0], 0), mode='constant', value=PAD)
+            instance = pad(instance, (0, 0, RAW_SEQ_LEN - instance.shape[0], 0), mode='constant', value=PAD)
         return instance

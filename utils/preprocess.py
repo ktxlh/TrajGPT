@@ -126,7 +126,7 @@ def split_indices_for_next_prediction(df):
     user_first_indices = groupby_user.nth(0).index
     # 2. Instance with at least RAW_SEQ_LEN visits
     max_num_visits_per_user = groupby_user.size().max()
-    long_enough_indices = groupby_user.nth(list(range(-max_num_visits_per_user, -RAW_SEQ_LEN[NEXT_PREDICTION]))).index
+    long_enough_indices = groupby_user.nth(list(range(-max_num_visits_per_user, -RAW_SEQ_LEN))).index
     # 3. Combine the two
     first_indices = user_first_indices.union(long_enough_indices)
 
@@ -136,7 +136,7 @@ def split_indices_for_next_prediction(df):
     # 2. Match it with first_indices
     user_last_indices = df.loc[first_indices]['user_id'].apply(lambda user_id: each_user_last_index.loc[user_id]).values
     # 3. Last index of each rolling window
-    rolling_window_last_indices = (first_indices + RAW_SEQ_LEN[NEXT_PREDICTION] - 1).values
+    rolling_window_last_indices = (first_indices + RAW_SEQ_LEN - 1).values
     last_indices = np.minimum(rolling_window_last_indices, user_last_indices)
 
     # Sort instances by arrival_time
@@ -197,8 +197,8 @@ def split_indices_for_infilling(df):
         indices = group.index
         
         # Split the indices into chunks of RAW_SEQ_LEN
-        for start in range(0, len(indices), RAW_SEQ_LEN[INFILLING]):
-            end = start + RAW_SEQ_LEN[INFILLING]
+        for start in range(0, len(indices), RAW_SEQ_LEN):
+            end = start + RAW_SEQ_LEN
             if end <= len(indices):
                 first_index = indices[start]
                 last_index = indices[end - 1]
@@ -226,9 +226,9 @@ def load_geolife_dataset(task):
     # Keep only necessary fields
     df = df[FIELDS]
 
-    train_data = TrajGPTDataset(df, train_indices, task)
-    val_data = TrajGPTDataset(df, val_indices, task)
-    test_data = TrajGPTDataset(df, test_indices, task)
+    train_data = TrajGPTDataset(df, train_indices)
+    val_data = TrajGPTDataset(df, val_indices)
+    test_data = TrajGPTDataset(df, test_indices)
 
     # Number of regions
     num_regions = df['region_id'].nunique()
