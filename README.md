@@ -32,7 +32,7 @@ unzip data/geolife.zip -d data
 
 3. Convert point-by-point trajectories to sequences of visits (a.k.a. staypoints).
 ```bash
-python3 utils/preprocess.py
+python3 preprocess.py
 ```
 This step takes around 5 minutes and only needs to be run once.
 

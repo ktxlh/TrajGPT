@@ -1,15 +1,16 @@
-import torch
-import pandas as pd
-from torch.optim import Adam
-from torch.utils.data import DataLoader
-from tqdm import trange
 from copy import deepcopy
+
+import pandas as pd
+import torch
+from torch.optim import Adafactor
+from torch.utils.data import DataLoader
+from tqdm import tqdm, trange
 
 from modules.model import TrajGPT
 from utils.constants import *
 from utils.metrics import *
-from utils.preprocess import *
 from utils.parser import parse_args
+from utils.preprocess import *
 
 
 def train():
@@ -101,7 +102,7 @@ if __name__ == "__main__":
     test_loader = DataLoader(test_data, batch_size=args.test_batch_size, shuffle=False)
 
     model = TrajGPT(num_regions + N_SPECIAL_TOKENS, SEQ_LEN[args.task], lambda_max).to(args.device)
-    optimizer = Adam(model.parameters(), args.lr)
+    optimizer = Adafactor(model.parameters())
 
     best_state_dict = train_model_with_early_stopping()    
     test_score = test_model(best_state_dict)

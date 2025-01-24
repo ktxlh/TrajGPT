@@ -1,6 +1,6 @@
 numpy==1.26.3
 pandas==2.1.4
-torch==2.2.0
+torch==2.5.1
 geopy==2.4.1
 tqdm==4.65.0
 h3==3.7.7

@@ -35,7 +35,7 @@ class Space2Vec(nn.Module):
         Returns:  (..., d_embed)
         """
         nominator = (x @ self.a.T).unsqueeze(-1)  # (..., 3, 1)
-        denominator = self.lambda_min * torch.pow(self.g, self.scales / self.S - 1)
+        denominator = self.lambda_min * torch.pow(self.g, self.scales / (self.S - 1))
         fraction = nominator / denominator  # (..., 3, num_scales)
         fraction = fraction.reshape(*fraction.shape[:-2], -1)  # (..., 3*num_scales)
         PE_sj = torch.concatenate([torch.cos(fraction), torch.sin(fraction)], axis=-1)  # (..., 6*num_scales)

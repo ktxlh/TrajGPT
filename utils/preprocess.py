@@ -1,17 +1,17 @@
-import torch
 import math
-from scipy.spatial import distance_matrix
-import numpy as np
-from pyproj import Proj
-from sympy import N
-import trackintel
-import pandas as pd
+from datetime import datetime
+
 import h3
 import numpy as np
-from datetime import datetime
+import pandas as pd
 import pytz
-from utils.dataset import TrajGPTDataset
+import torch
+import trackintel
+from pyproj import Proj
+from scipy.spatial import distance_matrix
+
 from utils.constants import *
+from utils.dataset import TrajGPTDataset
 
 
 #####################################################################
@@ -38,7 +38,7 @@ def load_geolife_visit_df():
 
     # Filter user
     # Each user should have at least 2 visits: one for input, the other for label
-    groupby = (df.groupby('user_id', as_index=True).size() >= 2)
+    groupby = (df.groupby('user_id', as_index=True).size() >= 20)
     users = groupby[groupby].index
     df = df[df['user_id'].isin(users)]
 
@@ -93,13 +93,13 @@ def process_space_inplace(df):
 
 
 def process_time_inplace(df):
-    # Convert time to relative time (unit: hour)
+    # Convert time to relative time (unit: day)
     oldest_timestamp = df['arrival_time'].min()
-    df['arrival_time'] = (df['arrival_time'] - oldest_timestamp).dt.total_seconds() / (60*60)
-    df['departure_time'] = (df['departure_time'] - oldest_timestamp).dt.total_seconds() / (60*60)
+    df['arrival_time'] = (df['arrival_time'] - oldest_timestamp).dt.total_seconds() / (60*60*24)
+    df['departure_time'] = (df['departure_time'] - oldest_timestamp).dt.total_seconds() / (60*60*24)
 
     # Calculate duration (unit: hour)
-    df['duration'] = (df['departure_time'] - df['arrival_time'])
+    df['duration'] = (df['departure_time'] - df['arrival_time']) * 24
 
     # Calculate travel time (unit: hour)
     df['travel_time'] = (df['arrival_time'] - df['departure_time'].shift(1))
