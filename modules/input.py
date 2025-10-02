@@ -25,12 +25,12 @@ class SourceInput(nn.Module):
         Each input variable is a tensor of size (batch_size, seq_len)
         """
         locations = torch.stack([x, y], dim=-1)
-        loccation_encoding = self.space2vec(locations)
+        location_encoding = self.space2vec(locations)
         arrival_encoding = self.time2vec(arrival_time)
         departure_encoding = self.time2vec(departure_time)
         region_embedding = self.region_embedding(region_id)
         visit_embedding = torch.concat([
-            loccation_encoding,
+            location_encoding,
             arrival_encoding,
             departure_encoding,
             region_embedding

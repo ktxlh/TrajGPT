@@ -4,6 +4,7 @@ from modules.decoder import CausalMemoryDecoder
 from modules.encoder import CausalEncoder
 from modules.gmm import GMM
 from modules.input import SourceInput
+from utils.constants import N_SPECIAL_TOKENS
 
 
 class TrajGPT(nn.Module):
@@ -19,7 +20,7 @@ class TrajGPT(nn.Module):
 
         # Region prediction
         self.region_id_decoder = CausalEncoder(self.d_model, num_heads, 1, sequence_len)
-        self.region_id_head = nn.Linear(self.d_model, num_regions)
+        self.region_id_head = nn.Linear(self.d_model, num_regions + N_SPECIAL_TOKENS)
 
         # Arrival (travel) prediction
         self.d_travel = d_embed * 2  # Two: region_id, location
@@ -62,7 +63,7 @@ class TrajGPT(nn.Module):
         """travel_tgt: (batch_size, tgt_seq_len, d_travel)"""
         travel_decoder_input = travel_tgt[..., :self.d_travel]
         travel_dec = self.travel_decoder(travel_decoder_input, memory[..., :self.d_travel])  # (batch_size, tgt_seq_len, d_model)
-        travel_out = self.travel_head(travel_dec)  # (batch_size, tgt_seq_len, num_gaussians=1) for key in ['weight', 'loc','scale']        
+        travel_out = self.travel_head(travel_dec)  # (batch_size, tgt_seq_len, num_gaussians) for key in ['weight', 'loc','scale']        
         return travel_out
     
     def predict_duration(self, memory, duration_tgt):
