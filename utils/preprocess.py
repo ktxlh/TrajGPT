@@ -102,7 +102,7 @@ def process_time_inplace(df):
     df['duration'] = (df['departure_time'] - df['arrival_time']) * 24
 
     # Calculate travel time (unit: hour)
-    df['travel_time'] = (df['arrival_time'] - df['departure_time'].shift(1))
+    df['travel_time'] = (df['arrival_time'] - df['departure_time'].shift(1)) * 24
     # First row of each user does not have travel time
     df.loc[df.groupby('user_id').nth(0).index, 'travel_time'] = 0
 
@@ -273,7 +273,7 @@ def get_offset_kvpair_tensorized(batch_size, tensor, mask, offsets=None):
         seq_len = tensor.shape[1]
         x = torch.arange(batch_size).unsqueeze(1).expand(batch_size, seq_len)
         y = torch.cumsum(mask, dim=1) - 1
-        if offsets != None:
+        if offsets is not None:
             y += offsets.unsqueeze(1).expand(batch_size, seq_len)
         new_indices = torch.stack([x[mask], y[mask]], dim=-1).view(-1, 2)
         values = tensor[mask]
