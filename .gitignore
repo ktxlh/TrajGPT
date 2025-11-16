@@ -10,3 +10,6 @@ __pycache__/
 
 # Ignore any .ipynb_checkpoints directories
 .ipynb_checkpoints/
+
+wandb/
+output/
